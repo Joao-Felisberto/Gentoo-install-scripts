@@ -42,7 +42,7 @@ mount "$root_part" /mnt/gentoo
 cd /mnt/gentoo
 
 # TODO: make this download the latest automatically, simple string editing with the output of `date`
-wget https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20210711T170538Z/stage3-amd64-systemd-20210711T170538Z.tar.xz
+wget https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20210711T170538Z/stage3-amd64-openrc-20210711T170538Z.tar.xz
 
 tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 
