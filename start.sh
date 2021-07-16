@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# make.conf
+
 #############################
 #	READ CONFIGS/USER INPUT #
 ########################### #
@@ -39,7 +41,8 @@ mount "$root_part" /mnt/gentoo
 
 cd /mnt/gentoo
 
-wget https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20210331T214503Z/stage3-amd64-20210331T214503Z.tar.xz
+# TODO: make this download the latest automatically, simple string editing with the output of `date`
+wget https://bouncer.gentoo.org/fetch/root/all/releases/amd64/autobuilds/20210711T170538Z/stage3-amd64-systemd-20210711T170538Z.tar.xz
 
 tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 
@@ -58,17 +61,23 @@ tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 # CXXLAGS="${COMMON_FLAGS}"
 # MAKEOPTS="-j${nproc}" # number of cores plus one OR 1 per 2Gb of ram. See lscpu: sockets * cores per socket
 
-#vim /mnt/gentoo/etc/portage/make.conf.example
-vim /mnt/gentoo/etc/portage/make.conf
+#nano /mnt/gentoo/etc/portage/make.conf.example
+
+# nano /mnt/gentoo/etc/portage/make.conf
+mv make.conf /mnt/gentoo/etc/portage/make.conf
 
 #############
 #	MIRRORS #
 #############
 # TODO: select mirrors automatically
-mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
+mirrorselect -io >> /mnt/gentoo/etc/portage/make.conf
 
 mkdir --parents /mnt/gentoo/etc/portage/repos.conf
 cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+
+#####################
+#	COPY DNS INFO	#
+#####################
 
 cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 
@@ -87,6 +96,8 @@ chroot /mnt/gentoo /bin/bash /install.sh $root_pass $user $user_pass $hostname $
 ###########
 #	CLEAN #
 ###########
+cd
+
 rm /mnt/install.sh
 rm /mnt/services.install
 

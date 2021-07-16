@@ -1,6 +1,11 @@
 #! /bin/bash
-#1			2		3			4		5
+#1          2     3          4         5
 #$root_pass $user $user_pass $hostname $boot_part
+
+# make.conf
+# rc.conf
+# keymaps
+# hwclock
 
 source /etc/profile
 export PS1="\n\[\033[36m\]\w \\$>\[\033[00m\] "
@@ -13,7 +18,10 @@ mount $boot_part /boot
 #######################
 #	CONFIGURE PORTAGE #
 #######################
-emerge-webrsync
+
+# for poor networks only
+# emerge-webrsync
+
 emerge --sync --quiet
 
 #############
@@ -37,7 +45,7 @@ emerge --verbose --update --deep --newuse @world
 # view all with less /var/db/repos/gentoo/profiles/use.desc
 
 # For kde USE="-gtk -gnome qt4 qt5 kde dvd alsa cdr"
-vim /etc/portage/make.conf
+# nano /etc/portage/make.conf
 
 ###############
 #	TIME ZONE #
@@ -67,7 +75,15 @@ env-update && source /etc/profile && export PS1="\n\[\033[36m\]\w \\$>\[\033[00m
 
 emerge sys-kernel/gentoo-sources
 
+eselect kernel set 1
+
+# to get system info, lspci, lsmod
+# emerge sys-apps/pciutils
+
 cd /usr/src/linux
+
+# TODO: this uses a menu, make it automatic
+# https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel
 make menuconfig
 
 make && make modules_install
@@ -79,7 +95,7 @@ make install
 # TODO: automate
 # see https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/System
 
-vim /etc/fstab
+nano /etc/fstab
 
 #############
 #	NETWORK #
@@ -88,9 +104,12 @@ vim /etc/fstab
 
 echo "hostname=\"$4\"" > /etc/conf.d/hostname
 
+# nano /etc/conf.d/net
+echo "dns_domain_lo=\"localhost\"" > /etc/conf.d/net
+
 emerge --noreplace net-misc/netifrc
 
-vim /etc/conf.d/net
+echo "config_eth0=\"dhcp\"" >> /etc/conf.d/net
 
 cd /etc/init.d
 ln -s net.lo net.eth0
@@ -113,13 +132,13 @@ echo "$2:$3" | chpasswd
 # TODO: automate
 # see https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/System#Init_and_boot_configuration
 
-vim /etc/rc.conf
+nano /etc/rc.conf
 
 # keyboard layout
-vim /etc/conf.d/keymaps
+nano /etc/conf.d/keymaps
 
 # clock
-vim /etc/conf.d/hwclock
+nano /etc/conf.d/hwclock
 
 ###########
 #	TOOLS #
@@ -133,8 +152,13 @@ rc-update add sysklogd default
 emerge sys-process/cronie
 rc-update add cronie default
 
-# stuff to handle fat32 file systems
+# for faster file location
+emerge sys-apps/mlocate
+
+# stuff to handle ext4 and fat32 file systems
+# emerge sys-fs/e2fsprogs already installed
 emerge sys-fs/dosfstools
+
 
 ################
 #	BOOTLOADER #
